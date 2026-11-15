@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://getitresolvedwebsite.vercel.app/sitemap.xml
+Sitemap: https://getitresolved.company/sitemap.xml
