@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const STORAGE = { cases: 'gir_cases_v3', companies: 'gir_custom_companies_v3' };
+  const STORAGE = { cases: 'gir_cases_v3' };
   const VIEWS = ['submit', 'tracker', 'directory'];
   const DEFAULT_LOGO = 'assets/favicon.svg';
   let companies = [...GLOBAL_COMPANIES];
@@ -50,21 +50,71 @@
     };
   }
 
-  function normalizeCustomCompany(item) {
+  const remoteCompanyCache = new Map();
+  const remoteCompanyRequests = new Map();
+  let companyLookupTimer = null;
+  let companyLookupRequest = 0;
+  let directoryLookupTimer = null;
+  let directoryLookupRequest = 0;
+
+  function normalizeCompanyQuery(value) {
+    return String(value || '').normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase()
+      .replace(/[^\p{L}\p{N}]+/gu, ' ').trim().replace(/\s+/g, ' ');
+  }
+
+  function normalizeRemoteCompany(item) {
     if (!item || typeof item !== 'object' || !item.id || !item.name) return null;
-    const domain = cleanText(item.domain).slice(0, 255);
     return {
-      id: cleanText(item.id).replace(/[^a-zA-Z0-9_-]/g, ''),
-      name: cleanText(item.name).slice(0, 120), domain,
-      sector: cleanText(item.sector, 'Customer Service & Support'), region: cleanText(item.region, 'Global'),
-      logo: cleanText(item.logo, domain ? `https://logo.uplead.com/${domain}` : DEFAULT_LOGO), custom: true
+      id: cleanText(item.id).slice(0, 80),
+      name: cleanText(item.name).slice(0, 120),
+      domain: cleanText(item.domain).slice(0, 255),
+      sector: 'Customer Service & Support',
+      region: 'Global',
+      logo: cleanText(item.logoUrl, DEFAULT_LOGO),
+      hasCachedLogo: Boolean(item.logoUrl),
+      cacheId: cleanText(item.logoCacheId || item.id),
+      custom: true
     };
+  }
+
+  function searchRemoteCompanies(rawQuery) {
+    const key = normalizeCompanyQuery(rawQuery);
+    if (key.length < 2) return Promise.resolve([]);
+    if (remoteCompanyCache.has(key)) return Promise.resolve(remoteCompanyCache.get(key));
+    if (remoteCompanyRequests.has(key)) return remoteCompanyRequests.get(key);
+    const request = fetch('/api/companies', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'search', query: rawQuery.trim().slice(0, 120) })
+    }).then(async response => {
+      if (!response.ok) throw new Error('Company search unavailable');
+      const payload = await response.json();
+      const results = (Array.isArray(payload.companies) ? payload.companies : [])
+        .map(normalizeRemoteCompany).filter(Boolean);
+      remoteCompanyCache.set(key, results);
+      return results;
+    }).finally(() => remoteCompanyRequests.delete(key));
+    remoteCompanyRequests.set(key, request);
+    return request;
+  }
+
+  function mergeRemoteCompanies(remoteCompanies) {
+    const results = [];
+    remoteCompanies.forEach(remoteCompany => {
+      const existing = companies.find(company => company.id === remoteCompany.id ||
+        (remoteCompany.domain && company.domain === remoteCompany.domain));
+      if (existing) results.push(existing);
+      else {
+        companies.unshift(remoteCompany);
+        results.push(remoteCompany);
+      }
+    });
+    return results;
   }
 
   function initApp() {
     cases = readStorage(STORAGE.cases).map(normalizeCase).filter(Boolean);
-    const customCompanies = readStorage(STORAGE.companies).map(normalizeCustomCompany).filter(Boolean);
-    companies = [...customCompanies, ...GLOBAL_COMPANIES];
+    companies = [...GLOBAL_COMPANIES];
 
     bindEvents();
     renderAll();
@@ -80,16 +130,16 @@
     if (deepCompany) {
       const match = companies.find(company => company.name.toLowerCase() === deepCompany.toLowerCase() || (company.domain || '').toLowerCase() === deepCompany.toLowerCase());
       if (match) selectCompany(match.id);
-      else {
-        $('companySearchInput').value = deepCompany;
-        renderCompanyDropdown([], deepCompany);
-        notifyToast('That company is not listed. Add its official website to continue.');
-      }
+      else $('companySearchInput').value = deepCompany;
     }
 
     const initialHash = window.location.hash.slice(1);
     if (initialHash === 'faq') switchView('submit', { updateHash: false, scroll: false });
     else switchView(VIEWS.includes(initialHash) ? initialHash : 'submit', { updateHash: false, scroll: false });
+    if (deepCompany && !selectedCompany) {
+      switchView('submit', { updateHash: false, scroll: false });
+      filterCompanyDropdown(true);
+    }
     if (initialHash === 'faq') setTimeout(() => $('faq').scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth' }), 0);
   }
 
@@ -130,11 +180,14 @@
         openCompanyDropdown();
         $('companyDropdownList').querySelector('button')?.focus();
       }
-      if (event.key === 'Enter' && !$('companyDropdownList').hidden) {
+      if (event.key === 'Enter') {
+        if (event.isComposing || event.keyCode === 229) return;
         const typed = event.target.value.trim();
-        const exact = companies.find(company => company.name.toLowerCase() === typed.toLowerCase());
-        if (exact) { event.preventDefault(); selectCompany(exact.id); }
-        else if (typed.length > 1) { event.preventDefault(); quickAddCompany(typed); }
+        if (!typed || $('companyDropdownList').hidden) return;
+        event.preventDefault();
+        const exact = companies.find(company => normalizeCompanyQuery(company.name) === normalizeCompanyQuery(typed));
+        if (exact) selectCompany(exact.id);
+        else void resolveTypedCompany(typed);
       }
     });
     $('browseCompanies').addEventListener('click', () => {
@@ -146,10 +199,8 @@
     $('companyDropdownList').addEventListener('click', event => {
       const companyButton = event.target.closest('[data-company-id]');
       const quickButton = event.target.closest('[data-quick-name]');
-      const customButton = event.target.closest('[data-custom-name]');
       if (companyButton) selectCompany(companyButton.dataset.companyId);
       if (quickButton) quickAddCompany(quickButton.dataset.quickName);
-      if (customButton) openCustomCompanyModal(customButton.dataset.customName);
     });
     $('companyDropdownList').addEventListener('keydown', event => {
       const buttons = [...event.currentTarget.querySelectorAll('button')];
@@ -197,17 +248,27 @@
     document.addEventListener('error', event => {
       const image = event.target;
       if (!(image instanceof HTMLImageElement) || !image.hasAttribute('data-company-logo')) return;
-      if (image.dataset.fallback) {
-        const fallback = image.dataset.fallback;
-        delete image.dataset.fallback;
-        image.src = fallback;
-      } else if (image.id === 'selCompLogoImg') {
-        // Never remove this element: selectCompany() reuses it for the next selection.
-        if (!image.src.endsWith('/assets/favicon.svg')) image.src = DEFAULT_LOGO;
-      } else {
-        const frame = image.closest('.logo-frame');
-        if (frame) frame.innerHTML = '<span class="logo-unavailable">Logo unavailable</span>';
+      const cacheId = image.dataset.companyCacheId;
+      if (cacheId && !image.dataset.logoRepairTried) {
+        image.dataset.logoRepairTried = 'true';
+        void fetch('/api/companies', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'repair', id: cacheId })
+        }).then(response => response.ok ? response.json() : null).then(payload => {
+          const repaired = normalizeRemoteCompany(payload?.company);
+          if (repaired?.hasCachedLogo) {
+            const cached = companies.find(company => company.cacheId === cacheId || company.id === cacheId);
+            if (cached) cached.logo = repaired.logo;
+            if (selectedCompany?.cacheId === cacheId) selectedCompany.logo = repaired.logo;
+            image.src = repaired.logo;
+            return;
+          }
+          showLogoFallback(image);
+        }).catch(() => showLogoFallback(image));
+        return;
       }
+      showLogoFallback(image);
     }, true);
   }
 
@@ -257,9 +318,18 @@
     if (scroll) window.scrollTo({ top: 0, behavior: reducedMotion() ? 'auto' : 'smooth' });
   }
 
+  function showLogoFallback(image) {
+    if (image.id === 'selCompLogoImg') {
+      if (!image.src.endsWith('/assets/favicon.svg')) image.src = DEFAULT_LOGO;
+      return;
+    }
+    const frame = image.closest('.logo-frame');
+    if (frame) frame.innerHTML = '<span class="logo-unavailable" aria-hidden="true">Logo unavailable</span>';
+  }
+
   function logoMarkup(company, eager = false) {
-    const fallback = company.custom && company.domain ? `https://icon.horse/icon/${encodeURIComponent(company.domain)}` : '';
-    return `<span class="logo-frame"><img src="${escapeStr(company.logo || DEFAULT_LOGO)}" alt="${escapeStr(company.name)} logo" width="40" height="40" ${eager ? '' : 'loading="lazy"'} decoding="async" data-company-logo ${fallback ? `data-fallback="${escapeStr(fallback)}"` : ''}></span>`;
+    const cacheId = company.cacheId && company.hasCachedLogo ? company.cacheId : '';
+    return `<span class="logo-frame"><img src="${escapeStr(company.logo || DEFAULT_LOGO)}" alt="" width="40" height="40" ${eager ? '' : 'loading="lazy"'} decoding="async" data-company-logo ${cacheId ? `data-company-cache-id="${escapeStr(cacheId)}"` : ''}></span>`;
   }
 
   function openCompanyDropdown() {
@@ -274,26 +344,71 @@
   }
 
   function filterCompanyDropdown(open = true) {
-    const query = $('companySearchInput').value.trim().toLowerCase();
-    const filtered = companies.filter(company => [company.name, company.sector, company.region, company.domain].some(value => String(value || '').toLowerCase().includes(query)));
-    renderCompanyDropdown(filtered, query);
+    const rawQuery = $('companySearchInput').value.trim();
+    const normalized = normalizeCompanyQuery(rawQuery);
+    const filtered = companies.filter(company => [company.name, company.domain].some(value => normalizeCompanyQuery(value).includes(normalized)));
+    window.clearTimeout(companyLookupTimer);
+    const requestId = ++companyLookupRequest;
+    const needsRemoteSearch = normalized.length >= 2 && filtered.length === 0;
+    renderCompanyDropdown(filtered, rawQuery, { loading: needsRemoteSearch });
+    if (needsRemoteSearch && !remoteCompanyCache.has(normalized)) {
+      companyLookupTimer = window.setTimeout(async () => {
+        try {
+          const matches = mergeRemoteCompanies(await searchRemoteCompanies(rawQuery));
+          if (requestId !== companyLookupRequest || normalizeCompanyQuery($('companySearchInput').value) !== normalized) return;
+          const currentMatches = matches.filter(company => normalizeCompanyQuery(company.name).includes(normalized) || normalizeCompanyQuery(company.domain).includes(normalized));
+          renderCompanyDropdown(currentMatches, rawQuery);
+        } catch {
+          if (requestId === companyLookupRequest) renderCompanyDropdown([], rawQuery, { error: true });
+        }
+      }, 280);
+    } else if (needsRemoteSearch && remoteCompanyCache.has(normalized)) {
+      const matches = mergeRemoteCompanies(remoteCompanyCache.get(normalized));
+      renderCompanyDropdown(matches, rawQuery);
+    }
     if (open) {
       $('companyDropdownList').hidden = false;
       $('companySearchInput').setAttribute('aria-expanded', 'true');
     }
   }
 
-  function renderCompanyDropdown(list, rawQuery = '') {
+  function renderCompanyDropdown(list, rawQuery = '', state = {}) {
     const menu = $('companyDropdownList');
     const safeQuery = rawQuery.trim();
-    const hasExact = companies.some(company => company.name.toLowerCase() === safeQuery.toLowerCase());
-    const custom = safeQuery.length > 1 && !hasExact ? `<div class="dropdown-custom"><p>Can’t find <strong>“${escapeStr(safeQuery)}”</strong>? You can still submit a case.</p><button type="button" class="button button-primary" data-quick-name="${escapeStr(safeQuery)}">Use “${escapeStr(safeQuery)}” &amp; continue</button> <button type="button" class="button button-secondary" data-custom-name="${escapeStr(safeQuery)}">Add with website &amp; logo</button></div>` : '';
-    const options = list.slice(0, 80).map(company => `<button type="button" class="company-option" role="option" data-company-id="${escapeStr(company.id)}"><span class="company-option-main">${logoMarkup(company)}<span class="company-option-copy"><span class="company-option-name">${escapeStr(company.name)}</span><span class="company-option-meta">${escapeStr(company.region)} · ${escapeStr(company.sector)}</span></span></span><span class="option-action">Select →</span></button>`).join('');
-    menu.innerHTML = custom + (options || '<div class="empty-dropdown">No listed companies match. Use the button above to submit a case against any company.</div>');
+    const status = state.loading
+      ? '<div class="empty-dropdown" role="status">Searching verified company sources…</div>'
+      : state.error
+        ? '<div class="empty-dropdown" role="status">Company search is temporarily unavailable.</div>'
+        : '';
+    const custom = !list.length && !state.loading && safeQuery.length > 1
+      ? `<div class="dropdown-custom"><p>${state.error ? 'You can retry by editing the search, or continue with the name only.' : `No verified company match for “${escapeStr(safeQuery)}”. You can still submit using the name only.`}</p><button type="button" class="button button-primary" data-quick-name="${escapeStr(safeQuery)}">Use name only</button></div>`
+      : '';
+    const options = list.slice(0, 80).map(company => `<button type="button" class="company-option" role="option" data-company-id="${escapeStr(company.id)}"><span class="company-option-main">${logoMarkup(company)}<span class="company-option-copy"><span class="company-option-name">${escapeStr(company.name)}</span></span></span><span class="option-action">Select <span aria-hidden="true">→</span></span></button>`).join('');
+    menu.innerHTML = status + custom + options || '<div class="empty-dropdown">Type a company name to search.</div>';
+  }
+
+  async function resolveTypedCompany(rawQuery) {
+    const query = rawQuery.trim();
+    const normalized = normalizeCompanyQuery(query);
+    const menu = $('companyDropdownList');
+    renderCompanyDropdown([], query, { loading: true });
+    try {
+      const matches = mergeRemoteCompanies(await searchRemoteCompanies(query));
+      const exact = matches.filter(company => normalizeCompanyQuery(company.name) === normalized);
+      if (exact.length === 1) {
+        selectCompany(exact[0].id);
+        return;
+      }
+      renderCompanyDropdown(matches, query);
+    } catch {
+      renderCompanyDropdown([], query, { error: true });
+    }
+    menu.hidden = false;
+    $('companySearchInput').setAttribute('aria-expanded', 'true');
   }
 
   function selectCompany(companyId) {
-    const company = companies.find(item => item.id === companyId);
+    const company = typeof companyId === 'object' ? companyId : companies.find(item => item.id === companyId);
     if (!company) return;
     selectedCompany = company;
     $('companySearchInput').value = company.name;
@@ -302,12 +417,12 @@
     $('selectedCompanyBanner').hidden = false;
     const image = $('selCompLogoImg');
     image.src = company.logo || DEFAULT_LOGO;
-    image.alt = `${company.name} logo`;
+    image.alt = '';
     image.dataset.companyLogo = '';
-    if (company.custom && company.domain) image.dataset.fallback = `https://icon.horse/icon/${encodeURIComponent(company.domain)}`;
-    else delete image.dataset.fallback;
+    if (company.cacheId && company.hasCachedLogo) image.dataset.companyCacheId = company.cacheId;
+    else delete image.dataset.companyCacheId;
+    delete image.dataset.logoRepairTried;
     $('selCompName').textContent = company.name;
-    $('selCompMeta').textContent = [company.region, company.sector, company.domain].filter(Boolean).join(' · ');
     const dial = $('custDialCode');
     if (['United States', 'Canada'].includes(company.region)) dial.value = '+1';
     else if (company.region === 'United Kingdom') dial.value = '+44';
@@ -329,24 +444,42 @@
 
   function renderTrendingSidebar() {
     const trending = companies.filter(company => company.trending).slice(0, 7);
-    $('trendingCompaniesSidebar').innerHTML = trending.map(company => `<button type="button" class="company-list-item" data-select-company="${escapeStr(company.id)}"><span class="company-line">${logoMarkup(company, true)}<span class="company-copy"><span class="company-name">${escapeStr(company.name)}</span><span class="company-meta">${escapeStr(company.region)}</span></span></span><span class="list-select">Select</span></button>`).join('');
+    $('trendingCompaniesSidebar').innerHTML = trending.map(company => `<button type="button" class="company-list-item" data-select-company="${escapeStr(company.id)}"><span class="company-line">${logoMarkup(company, true)}<span class="company-copy"><span class="company-name">${escapeStr(company.name)}</span></span></span><span class="list-select">Select</span></button>`).join('');
   }
 
   function renderDirectoryGrid() {
-    const query = $('dirSearch').value.trim().toLowerCase();
+    const rawQuery = $('dirSearch').value.trim();
+    const normalized = normalizeCompanyQuery(rawQuery);
     const region = $('dirRegion').value;
     const sector = $('dirSector').value;
-    const filtered = companies.filter(company => {
-      const matchesQuery = [company.name, company.sector, company.region, company.domain].some(value => String(value || '').toLowerCase().includes(query));
-      return matchesQuery && (region === 'ALL' || company.region === region) && (sector === 'ALL' || company.sector === sector);
-    });
+    const nameMatches = companies.filter(company => [company.name, company.domain].some(value => normalizeCompanyQuery(value).includes(normalized)));
+    const filtered = nameMatches.filter(company => (region === 'ALL' || company.region === region) && (sector === 'ALL' || company.sector === sector));
     $('directoryResultCount').textContent = `${filtered.length.toLocaleString('en-GB')} ${filtered.length === 1 ? 'company' : 'companies'} found`;
-    if (!filtered.length) {
-      $('directoryCardsGrid').innerHTML = '<div class="empty-state"><h3>No companies match these filters</h3><p>Clear a filter or add the company using its official website.</p><button type="button" class="button button-primary" id="emptyAddCompany">Add unlisted company</button></div>';
-      $('emptyAddCompany').addEventListener('click', () => openCustomCompanyModal($('dirSearch').value.trim()));
+    if (!filtered.length && normalized.length >= 2 && !nameMatches.length && !remoteCompanyCache.has(normalized)) {
+      window.clearTimeout(directoryLookupTimer);
+      const requestId = ++directoryLookupRequest;
+      $('directoryResultCount').textContent = 'Searching verified company sources…';
+      $('directoryCardsGrid').innerHTML = '<div class="empty-state" role="status"><h3>Searching company names</h3><p>Checking the shared company directory and verified public sources.</p></div>';
+      directoryLookupTimer = window.setTimeout(async () => {
+        try {
+          mergeRemoteCompanies(await searchRemoteCompanies(rawQuery));
+          if (requestId === directoryLookupRequest && normalizeCompanyQuery($('dirSearch').value) === normalized) renderDirectoryGrid();
+        } catch {
+          if (requestId === directoryLookupRequest) {
+            $('directoryResultCount').textContent = 'Search unavailable';
+            $('directoryCardsGrid').innerHTML = '<div class="empty-state"><h3>Company search is temporarily unavailable</h3><p>Try again by editing the company name.</p></div>';
+          }
+        }
+      }, 280);
       return;
     }
-    $('directoryCardsGrid').innerHTML = filtered.map(company => `<article class="panel company-card"><div><div class="company-card-top">${logoMarkup(company)}<span class="region-tag">${escapeStr(company.region)}</span></div><h3>${escapeStr(company.name)}</h3><p>${escapeStr(company.sector)}${company.domain ? `<br>${escapeStr(company.domain)}` : ''}</p></div><button type="button" class="button button-primary" data-start-case="${escapeStr(company.id)}">Submit a case <span aria-hidden="true">→</span></button></article>`).join('');
+    window.clearTimeout(directoryLookupTimer);
+    if (!filtered.length) {
+      $('directoryCardsGrid').innerHTML = '<div class="empty-state"><h3>No companies match these filters</h3><p>Clear a filter or search for a different company.</p><button type="button" class="button button-primary" id="emptyAddCompany">Search unlisted company</button></div>';
+      $('emptyAddCompany').addEventListener('click', () => openCustomCompanyModal(rawQuery));
+      return;
+    }
+    $('directoryCardsGrid').innerHTML = filtered.map(company => `<article class="panel company-card"><div><div class="company-card-top">${logoMarkup(company)}</div><h3>${escapeStr(company.name)}</h3></div><button type="button" class="button button-primary" data-start-case="${escapeStr(company.id)}">Submit a case <span aria-hidden="true">→</span></button></article>`).join('');
   }
 
   function updateHeaderCounts() {
@@ -504,78 +637,69 @@
   function quickAddCompany(rawName) {
     const name = rawName.trim().replace(/\s+/g, ' ').slice(0, 120);
     if (name.length < 2) return;
-    const existing = companies.find(company => company.name.toLowerCase() === name.toLowerCase());
+    const existing = companies.find(company => normalizeCompanyQuery(company.name) === normalizeCompanyQuery(name));
     if (existing) { selectCompany(existing.id); return; }
-    const company = {
-      id: `custom_${Date.now()}`, name, domain: '',
+    selectCompany({
+      id: `manual_${Date.now()}`, name, domain: '',
       sector: 'Customer Service & Support', region: 'Global',
-      logo: DEFAULT_LOGO, custom: true
-    };
-    companies.unshift(company);
-    writeStorage(STORAGE.companies, companies.filter(item => item.custom));
-    renderDirectoryGrid();
-    selectCompany(company.id);
-    notifyToast(`“${name}” added. You can now submit your case.`, 'success');
+      logo: DEFAULT_LOGO, custom: false
+    });
+    notifyToast('Name-only selection. No verified company logo was found.');
   }
 
   function openCustomCompanyModal(prefill = '') {
     $('customCompanyError').hidden = true;
-    if (prefill) $('customCompName').value = prefill;
+    $('customCompName').value = prefill;
     openModal($('customCompanyModal'));
   }
 
-  function saveCustomCompany(event) {
+  async function saveCustomCompany(event) {
     event.preventDefault();
     const name = $('customCompName').value.trim();
-    const website = $('customCompWebsite').value.trim();
     const error = $('customCompanyError');
+    const submitButton = $('customCompanyForm').querySelector('button[type="submit"]');
     error.hidden = true;
-    let domain = '';
-    if (website) {
-      try {
-        const url = new URL(/^https?:\/\//i.test(website) ? website : `https://${website}`);
-        if (!url.hostname.includes('.')) throw new Error('Invalid website');
-        domain = url.hostname.toLowerCase().replace(/^www\./, '');
-      } catch (_) {
-        error.textContent = 'Enter a valid website such as https://www.example.com, or leave it blank.';
-        error.hidden = false;
-        $('customCompWebsite').focus();
+    if (name.length < 2) {
+      error.textContent = 'Enter at least two characters to search.';
+      error.hidden = false;
+      $('customCompName').focus();
+      return;
+    }
+
+    submitButton.disabled = true;
+    submitButton.setAttribute('aria-busy', 'true');
+    submitButton.textContent = 'Searching…';
+    try {
+      const found = mergeRemoteCompanies(await searchRemoteCompanies(name));
+      const exact = found.filter(company => normalizeCompanyQuery(company.name) === normalizeCompanyQuery(name));
+      if (exact.length === 1) {
+        $('customCompanyForm').reset();
+        closeModal($('customCompanyModal'));
+        switchView('submit');
+        selectCompany(exact[0].id);
+        notifyToast('Verified company found and selected.', 'success');
         return;
       }
-    }
-    const socialDomains = ['facebook.com', 'instagram.com', 'twitter.com', 'x.com', 'linkedin.com', 'tiktok.com', 'youtube.com', 'linktr.ee'];
-    if (domain && socialDomains.some(blocked => domain === blocked || domain.endsWith(`.${blocked}`))) {
-      error.textContent = 'Use the company’s own website domain rather than a social-media or link-directory page.';
+      if (found.length) {
+        $('customCompanyForm').reset();
+        closeModal($('customCompanyModal'));
+        switchView('submit');
+        $('companySearchInput').value = name;
+        renderCompanyDropdown(found, name);
+        openCompanyDropdown();
+        notifyToast('Several verified matches were found. Choose the correct company.');
+        return;
+      }
+      error.textContent = 'No verified company match was found. You can still submit using the name only from the company search.';
       error.hidden = false;
-      return;
-    }
-    if (!name) {
-      error.textContent = 'Enter the company name.';
+    } catch {
+      error.textContent = 'Company search is temporarily unavailable. Try again or use the name-only option in the company search.';
       error.hidden = false;
-      return;
+    } finally {
+      submitButton.disabled = false;
+      submitButton.removeAttribute('aria-busy');
+      submitButton.textContent = 'Search company names';
     }
-    const existing = companies.find(company => (domain && company.domain === domain) || company.name.toLowerCase() === name.toLowerCase());
-    if (existing) {
-      closeModal($('customCompanyModal'));
-      switchView('submit');
-      selectCompany(existing.id);
-      notifyToast('That company is already listed and has been selected.', 'success');
-      return;
-    }
-    const company = {
-      id: `custom_${Date.now()}`, name, domain,
-      sector: $('customCompSector').value, region: $('customCompRegion').value,
-      logo: domain ? `https://logo.uplead.com/${encodeURIComponent(domain)}` : DEFAULT_LOGO, custom: true
-    };
-    companies.unshift(company);
-    const customCompanies = companies.filter(item => item.custom);
-    writeStorage(STORAGE.companies, customCompanies);
-    renderDirectoryGrid();
-    $('customCompanyForm').reset();
-    closeModal($('customCompanyModal'));
-    switchView('submit');
-    selectCompany(company.id);
-    notifyToast('Company added. You can now submit your case.', 'success');
   }
 
   function openModal(modal) {

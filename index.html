@@ -181,7 +181,7 @@
             <div class="form-section">
               <div class="form-section-title">
                 <h3>1. Choose the company <span class="required" aria-hidden="true">*</span></h3>
-                <button type="button" id="openCustomCompany" class="text-button">+ Add unlisted company</button>
+                <button type="button" id="openCustomCompany" class="text-button">+ Search unlisted company</button>
               </div>
               <div class="company-combobox" id="companySearchBox">
                 <label for="companySearchInput" class="sr-only">Search companies</label>
@@ -197,7 +197,6 @@
                   <span class="logo-frame"><img id="selCompLogoImg" src="assets/favicon.svg" alt="" width="36" height="36"></span>
                   <span class="company-copy">
                     <span id="selCompName" class="company-name"></span>
-                    <span id="selCompMeta" class="company-meta"></span>
                   </span>
                 </div>
                 <button type="button" id="clearCompany" class="button button-secondary">Change</button>
@@ -369,17 +368,12 @@
 
   <div id="customCompanyModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="customCompanyTitle" hidden>
     <div class="modal-dialog" tabindex="-1">
-      <div class="modal-header"><h2 id="customCompanyTitle">Add an unlisted company</h2><button type="button" id="closeCustomCompanyX" class="modal-close" aria-label="Close add company dialog">×</button></div>
+      <div class="modal-header"><h2 id="customCompanyTitle">Search for a company</h2><button type="button" id="closeCustomCompanyX" class="modal-close" aria-label="Close company search dialog">×</button></div>
       <form id="customCompanyForm" class="modal-body" novalidate>
-        <p class="small muted">Any company can be added. The official website is optional and is only used to show the company’s logo.</p>
-        <div class="field field-stacked"><label for="customCompName">Company name <span class="required" aria-hidden="true">*</span></label><input id="customCompName" type="text" maxlength="120" placeholder="e.g. National Grid" required></div>
-        <div class="field field-stacked"><label for="customCompWebsite">Official website <span class="muted">(optional)</span></label><input id="customCompWebsite" type="text" inputmode="url" placeholder="https://www.example.com"><p class="help-text">Optional. Use the company’s main domain, not a social-media page.</p></div>
-        <div class="form-grid field-stacked">
-          <div class="field"><label for="customCompRegion">Region</label><select id="customCompRegion"><option value="United States">United States</option><option value="United Kingdom" selected>United Kingdom</option><option value="Europe">Europe</option><option value="Global">Global</option><option value="Canada">Canada</option><option value="Australia">Australia</option><option value="New Zealand">New Zealand</option><option value="Middle East">Middle East</option><option value="Asia">Asia</option><option value="Africa">Africa</option><option value="South America">South America</option></select></div>
-          <div class="field"><label for="customCompSector">Industry</label><select id="customCompSector"><option value="Telecom & Broadband">Telecom &amp; broadband</option><option value="Energy & Utilities">Energy &amp; utilities</option><option value="Airlines & Travel">Airlines &amp; travel</option><option value="Travel Agencies & Booking">Travel agencies &amp; booking</option><option value="Hotels & Accommodation">Hotels &amp; accommodation</option><option value="Cruises & Holidays">Cruises &amp; holidays</option><option value="Car Rentals & Mobility">Car rentals &amp; mobility</option><option value="Banking & Fintech">Banking &amp; fintech</option><option value="Retail & E-Commerce" selected>Retail &amp; e-commerce</option><option value="Clothing & Fashion">Clothing &amp; fashion</option><option value="Courier & Logistics">Courier &amp; logistics</option><option value="Delivery & Subscriptions">Delivery &amp; subscriptions</option><option value="Parking, Auto & Mobility">Parking, auto &amp; mobility</option><option value="Customer Service & Support">Other services</option></select></div>
-        </div>
+        <p class="small muted">Search by company name only. Verified identities and logos are saved to the shared directory for future visitors.</p>
+        <div class="field field-stacked"><label for="customCompName">Company name <span class="required" aria-hidden="true">*</span></label><input id="customCompName" type="text" maxlength="120" placeholder="e.g. National Grid" autocomplete="organization" required></div>
         <div id="customCompanyError" class="form-message error" role="alert" hidden></div>
-        <div class="modal-actions"><button type="button" id="closeCustomCompany" class="button button-secondary">Cancel</button><button type="submit" class="button button-primary">Add &amp; select company</button></div>
+        <div class="modal-actions"><button type="button" id="closeCustomCompany" class="button button-secondary">Cancel</button><button type="submit" class="button button-primary">Search company names</button></div>
       </form>
     </div>
   </div>
