@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b0d0c"/>
+      <stop offset="1" stop-color="#101a15"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#17694f" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#17694f" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#000000" flood-opacity=".24"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#background)"/>
+  <ellipse cx="1045" cy="89" rx="430" ry="315" fill="url(#glow)"/>
+  <circle cx="1040" cy="78" r="210" fill="#a7f3c0" opacity=".035"/>
+  <rect x="68" y="54" width="48" height="48" rx="14" fill="#17694f"/>
+  <path d="M92 64 78 70v9c0 9 6 15 14 18 8-3 14-9 14-18v-9l-14-6Z" fill="none" stroke="#b0ffc4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="m86 79 4 4 8-9" fill="none" stroke="#b0ffc4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="132" y="87" font-family="Arial, Helvetica, sans-serif" font-size="31" font-weight="700" letter-spacing="-1.1" fill="#f8f7f4">GetIt<tspan fill="#b0ffc4">Resolved</tspan></text>
+  <text x="72" y="164" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="2.8" fill="#b0ffc4">A CLEARER WAY TO KEEP TRACK</text>
+  <text x="68" y="252" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="700" letter-spacing="-2.7" fill="#f8f7f4">Your complaint,</text>
+  <text x="68" y="326" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="700" letter-spacing="-2.7" fill="#b0ffc4">clearly documented.</text>
+  <text x="72" y="385" font-family="Arial, Helvetica, sans-serif" font-size="21" fill="#d0d1d2">Record the issue, get a clear reference,</text>
+  <text x="72" y="416" font-family="Arial, Helvetica, sans-serif" font-size="21" fill="#d0d1d2">and keep the details ready for follow-up.</text>
+  <rect x="70" y="466" width="490" height="54" rx="16" fill="#14261e" stroke="#285e45"/>
+  <circle cx="96" cy="493" r="5" fill="#b0ffc4"/>
+  <text x="114" y="499" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="600" fill="#e3f3e8">Record it</text>
+  <path d="M198 493h32" stroke="#547061" stroke-width="1.5"/>
+  <text x="248" y="499" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="600" fill="#e3f3e8">Get a reference</text>
+  <path d="M374 493h32" stroke="#547061" stroke-width="1.5"/>
+  <text x="424" y="499" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="600" fill="#e3f3e8">Follow up</text>
+  <text x="72" y="576" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#b0ffc4">getitresolved.org</text>
+  <rect x="690" y="70" width="440" height="490" rx="28" fill="#f9faf8" filter="url(#soft-shadow)"/>
+  <text x="730" y="119" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700" letter-spacing="2" fill="#17694f">COMPANY DIRECTORY</text>
+  <text x="730" y="161" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" letter-spacing="-.7" fill="#171b19">1,142 company listings</text>
+  <text x="730" y="190" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#626a65">Search brands and keep your case organised.</text>
+  <g fill="#ffffff" stroke="#e2e8e3">
+    <rect x="730" y="218" width="108" height="106" rx="15"/>
+    <rect x="856" y="218" width="108" height="106" rx="15"/>
+    <rect x="982" y="218" width="108" height="106" rx="15"/>
+    <rect x="730" y="344" width="108" height="106" rx="15"/>
+    <rect x="856" y="344" width="108" height="106" rx="15"/>
+    <rect x="982" y="344" width="108" height="106" rx="15"/>
+  </g>
+  <image href="assets/logos/groupon.svg" x="757" y="237" width="54" height="54" preserveAspectRatio="xMidYMid meet"/>
+  <text x="784" y="308" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="600" fill="#353b37">Groupon</text>
+  <image href="assets/logos/debenhams.svg" x="869" y="251" width="82" height="26" preserveAspectRatio="xMidYMid meet"/>
+  <text x="910" y="308" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="600" fill="#353b37">Debenhams</text>
+  <image href="assets/logos/amazon.png" x="883" y="361" width="54" height="54" preserveAspectRatio="xMidYMid meet"/>
+  <text x="910" y="434" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="600" fill="#353b37">Amazon</text>
+  <image href="assets/logos/british-gas.png" x="757" y="361" width="54" height="54" preserveAspectRatio="xMidYMid meet"/>
+  <text x="784" y="434" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="600" fill="#353b37">British Gas</text>
+  <image href="assets/logos/sky-uk.png" x="1009" y="361" width="54" height="54" preserveAspectRatio="xMidYMid meet"/>
+  <text x="1036" y="434" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="600" fill="#353b37">Sky</text>
+  <image href="assets/logos/ikea.png" x="1009" y="237" width="54" height="54" preserveAspectRatio="xMidYMid meet"/>
+  <text x="1036" y="308" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="600" fill="#353b37">IKEA</text>
+  <path d="M730 472h360" stroke="#e0e7e1"/>
+  <text x="730" y="505" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#6a716d">Brand marks identify listed companies only.</text>
+</svg>
