@@ -174,7 +174,7 @@ async function fetchWikidataJson(url) {
   const response = await fetchWithTimeout(url, {
     headers: {
       accept: 'application/json',
-      'user-agent': 'GetItResolvedCompanyLookup/1.0 (https://getitresolved.org; company-logo discovery)'
+      'user-agent': 'GetItResolvedCompanyLookup/1.0 (https://getitresolvedwebsite.vercel.app; company-logo discovery)'
     }
   }, 7000);
   if (!response.ok) throw new Error(`Wikidata request failed (${response.status})`);
