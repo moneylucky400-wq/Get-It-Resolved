@@ -230,12 +230,30 @@
     });
     closeCompanyDropdown();
     if (updateHash && window.location.hash !== `#${viewName}`) history.pushState(null, '', `#${viewName}`);
-    const titles = {
-      submit: 'GetItResolved | Customer Complaint Case Portal',
-      tracker: 'Track a Saved Case | GetItResolved',
-      directory: 'Global Company Directory | GetItResolved'
+    const pageMetadata = {
+      submit: {
+        title: 'GetItResolved | Customer Complaint Case Portal',
+        shareTitle: 'GetItResolved — Make your complaint easier to track',
+        description: 'Submit a customer service complaint, receive a unique GetItResolved case reference, and keep your details organised for follow-up.'
+      },
+      tracker: {
+        title: 'Track a Saved Case | GetItResolved',
+        shareTitle: 'Track a Saved Case | GetItResolved',
+        description: 'Review, copy, or print GetItResolved case references saved in this browser to keep complaint details ready for follow-up.'
+      },
+      directory: {
+        title: 'Global Company Directory | GetItResolved',
+        shareTitle: 'Global Company Directory | GetItResolved',
+        description: 'Search 1,140 companies across the UK, US, Europe, and global markets before preparing a customer service case.'
+      }
     };
-    document.title = titles[viewName];
+    const metadata = pageMetadata[viewName];
+    document.title = metadata.title;
+    document.querySelector('meta[name="description"]').content = metadata.description;
+    document.querySelector('meta[property="og:title"]').content = metadata.shareTitle;
+    document.querySelector('meta[property="og:description"]').content = metadata.description;
+    document.querySelector('meta[name="twitter:title"]').content = metadata.shareTitle;
+    document.querySelector('meta[name="twitter:description"]').content = metadata.description;
     if (scroll) window.scrollTo({ top: 0, behavior: reducedMotion() ? 'auto' : 'smooth' });
   }
 
