@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://getitresolved.org/sitemap.xml
+Sitemap: https://getitresolved.company/sitemap.xml
