@@ -104,7 +104,6 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-colo
 .brand-mark svg { width: 24px; height: 24px; }
 .brand-name { display: block; font-size: 1.12rem; font-weight: 800; letter-spacing: -.035em; line-height: 1.1; }
 .brand-name span { color: #b0ffc4; }
-.brand-tagline { display: block; margin-top: 4px; color: #b6b6bf; font-size: .65rem; font-weight: 600; letter-spacing: .09em; line-height: 1; text-transform: uppercase; }
 .primary-nav { display: flex; align-items: center; gap: 5px; }
 .nav-link {
   min-height: 44px;
@@ -384,7 +383,6 @@ main { flex: 1; padding-block: 34px 64px; }
 }
 @media (max-width: 560px) {
   .container { width: min(100% - 24px, var(--container)); }
-  .brand-tagline { font-size: .58rem; }
   .nav-link { font-size: .72rem; }
   .count-badge { display: none; }
   .hero h1 { font-size: 2.05rem; }

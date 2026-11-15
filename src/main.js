@@ -244,7 +244,7 @@
       directory: {
         title: 'Global Company Directory | GetItResolved',
         shareTitle: 'Global Company Directory | GetItResolved',
-        description: 'Search 1,140 companies across the UK, US, Europe, and global markets before preparing a customer service case.'
+        description: `Search ${GLOBAL_COMPANIES.length.toLocaleString('en-GB')} companies across the UK, US, Europe, and global markets before preparing a customer service case.`
       }
     };
     const metadata = pageMetadata[viewName];

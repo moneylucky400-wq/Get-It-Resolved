@@ -16,6 +16,7 @@ const GLOBAL_COMPANIES = [
   { id: 'hsbc', name: 'HSBC UK', domain: 'hsbc.co.uk', sector: 'Banking & Fintech', region: 'United Kingdom' },
   { id: 'parkingeye', name: 'ParkingEye', domain: 'parkingeye.co.uk', sector: 'Parking, Auto & Mobility', region: 'United Kingdom' },
   { id: 'currys', name: 'Currys', domain: 'currys.co.uk', sector: 'Retail & E-Commerce', region: 'United Kingdom' },
+  { id: 'debenhams', name: 'Debenhams', domain: 'debenhams.com', sector: 'Retail & E-Commerce', region: 'United Kingdom', logo: 'assets/logos/debenhams.svg' },
 
   { id: 'xfinity', name: 'Comcast Xfinity', domain: 'xfinity.com', sector: 'Telecom & Broadband', region: 'United States', trending: true },
   { id: 'att', name: 'AT&T', domain: 'att.com', sector: 'Telecom & Broadband', region: 'United States', trending: true },
@@ -53,6 +54,7 @@ const GLOBAL_COMPANIES = [
   { id: 'ikea', name: 'IKEA', domain: 'ikea.com', sector: 'Retail & E-Commerce', region: 'Europe' },
 
   { id: 'amazon', name: 'Amazon', domain: 'amazon.com', sector: 'Retail & E-Commerce', region: 'Global', trending: true },
+  { id: 'groupon', name: 'Groupon', domain: 'groupon.com', sector: 'Retail & E-Commerce', region: 'Global', logo: 'assets/logos/groupon.svg' },
   { id: 'paypal', name: 'PayPal', domain: 'paypal.com', sector: 'Banking & Fintech', region: 'Global' },
   { id: 'wise', name: 'Wise', domain: 'wise.com', sector: 'Banking & Fintech', region: 'Global' },
   { id: 'booking', name: 'Booking.com', domain: 'booking.com', sector: 'Airlines & Travel', region: 'Global' },
@@ -1148,5 +1150,5 @@ const GLOBAL_COMPANIES = [
   { id: "hertz-mx", name: "Hertz Mexico", domain: "hertz.com.mx", sector: "Car Rentals & Mobility", region: "South America" },
 ].map(company => ({
   ...company,
-  logo: `assets/logos/${company.id}.png`
+  logo: company.logo || `assets/logos/${company.id}.png`
 }));
