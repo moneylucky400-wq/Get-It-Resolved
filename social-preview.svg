@@ -12,50 +12,60 @@
       <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#000000" flood-opacity=".24"/>
     </filter>
   </defs>
+
   <rect width="1200" height="630" fill="url(#background)"/>
   <ellipse cx="1045" cy="89" rx="430" ry="315" fill="url(#glow)"/>
   <circle cx="1040" cy="78" r="210" fill="#a7f3c0" opacity=".035"/>
+
   <rect x="68" y="54" width="48" height="48" rx="14" fill="#17694f"/>
   <path d="M92 64 78 70v9c0 9 6 15 14 18 8-3 14-9 14-18v-9l-14-6Z" fill="none" stroke="#b0ffc4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="m86 79 4 4 8-9" fill="none" stroke="#b0ffc4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
   <text x="132" y="87" font-family="Arial, Helvetica, sans-serif" font-size="31" font-weight="700" letter-spacing="-1.1" fill="#f8f7f4">GetIt<tspan fill="#b0ffc4">Resolved</tspan></text>
-  <text x="72" y="164" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="2.8" fill="#b0ffc4">A CLEARER WAY TO KEEP TRACK</text>
+
+  <text x="72" y="164" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="2.8" fill="#b0ffc4">HERE WHEN YOU NEED HELP</text>
   <text x="68" y="252" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="700" letter-spacing="-2.7" fill="#f8f7f4">Your complaint,</text>
-  <text x="68" y="326" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="700" letter-spacing="-2.7" fill="#b0ffc4">clearly documented.</text>
-  <text x="72" y="385" font-family="Arial, Helvetica, sans-serif" font-size="21" fill="#d0d1d2">Record the issue, get a clear reference,</text>
-  <text x="72" y="416" font-family="Arial, Helvetica, sans-serif" font-size="21" fill="#d0d1d2">and keep the details ready for follow-up.</text>
+  <text x="68" y="326" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="700" letter-spacing="-2.7" fill="#b0ffc4">handled with care.</text>
+  <text x="72" y="385" font-family="Arial, Helvetica, sans-serif" font-size="21" fill="#d0d1d2">Talk through the issue, keep a clear record,</text>
+  <text x="72" y="416" font-family="Arial, Helvetica, sans-serif" font-size="21" fill="#d0d1d2">and know exactly what to do next.</text>
+
   <rect x="70" y="466" width="490" height="54" rx="16" fill="#14261e" stroke="#285e45"/>
   <circle cx="96" cy="493" r="5" fill="#b0ffc4"/>
-  <text x="114" y="499" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="600" fill="#e3f3e8">Record it</text>
+  <text x="114" y="499" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="600" fill="#e3f3e8">Talk to us</text>
   <path d="M198 493h32" stroke="#547061" stroke-width="1.5"/>
-  <text x="248" y="499" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="600" fill="#e3f3e8">Get a reference</text>
+  <text x="248" y="499" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="600" fill="#e3f3e8">Get support</text>
   <path d="M374 493h32" stroke="#547061" stroke-width="1.5"/>
-  <text x="424" y="499" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="600" fill="#e3f3e8">Follow up</text>
+  <text x="424" y="499" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="600" fill="#e3f3e8">Move forward</text>
   <text x="72" y="576" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#b0ffc4">getitresolved.org</text>
+
+  <!-- Customer-service illustration -->
   <rect x="690" y="70" width="440" height="490" rx="28" fill="#f9faf8" filter="url(#soft-shadow)"/>
-  <text x="730" y="119" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700" letter-spacing="2" fill="#17694f">COMPANY DIRECTORY</text>
-  <text x="730" y="161" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" letter-spacing="-.7" fill="#171b19">1,142 company listings</text>
-  <text x="730" y="190" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#626a65">Search brands and keep your case organised.</text>
-  <g fill="#ffffff" stroke="#e2e8e3">
-    <rect x="730" y="218" width="108" height="106" rx="15"/>
-    <rect x="856" y="218" width="108" height="106" rx="15"/>
-    <rect x="982" y="218" width="108" height="106" rx="15"/>
-    <rect x="730" y="344" width="108" height="106" rx="15"/>
-    <rect x="856" y="344" width="108" height="106" rx="15"/>
-    <rect x="982" y="344" width="108" height="106" rx="15"/>
-  </g>
-  <image href="assets/logos/groupon.svg" x="757" y="237" width="54" height="54" preserveAspectRatio="xMidYMid meet"/>
-  <text x="784" y="308" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="600" fill="#353b37">Groupon</text>
-  <image href="assets/logos/debenhams.svg" x="869" y="251" width="82" height="26" preserveAspectRatio="xMidYMid meet"/>
-  <text x="910" y="308" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="600" fill="#353b37">Debenhams</text>
-  <image href="assets/logos/amazon.png" x="883" y="361" width="54" height="54" preserveAspectRatio="xMidYMid meet"/>
-  <text x="910" y="434" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="600" fill="#353b37">Amazon</text>
-  <image href="assets/logos/british-gas.png" x="757" y="361" width="54" height="54" preserveAspectRatio="xMidYMid meet"/>
-  <text x="784" y="434" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="600" fill="#353b37">British Gas</text>
-  <image href="assets/logos/sky-uk.png" x="1009" y="361" width="54" height="54" preserveAspectRatio="xMidYMid meet"/>
-  <text x="1036" y="434" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="600" fill="#353b37">Sky</text>
-  <image href="assets/logos/ikea.png" x="1009" y="237" width="54" height="54" preserveAspectRatio="xMidYMid meet"/>
-  <text x="1036" y="308" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="600" fill="#353b37">IKEA</text>
-  <path d="M730 472h360" stroke="#e0e7e1"/>
-  <text x="730" y="505" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#6a716d">Brand marks identify listed companies only.</text>
+  <rect x="720" y="98" width="380" height="62" rx="18" fill="#edf5ef"/>
+  <circle cx="750" cy="129" r="16" fill="#17694f"/>
+  <path d="M750 121c-6 0-10 4-10 9v7c0 5 4 9 10 9s10-4 10-9v-7c0-5-4-9-10-9Z" fill="none" stroke="#b0ffc4" stroke-width="2"/>
+  <path d="M740 130c-5-1-8 2-8 6m28-6c5-1 8 2 8 6" fill="none" stroke="#b0ffc4" stroke-width="2" stroke-linecap="round"/>
+  <text x="778" y="125" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" fill="#17694f">Customer support</text>
+  <text x="778" y="146" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#626a65">Here to help you</text>
+
+  <rect x="720" y="180" width="380" height="226" rx="22" fill="#ffffff" stroke="#e2e8e3"/>
+  <text x="746" y="212" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700" letter-spacing="1.5" fill="#17694f">HOW CAN WE HELP?</text>
+
+  <rect x="746" y="232" width="328" height="50" rx="14" fill="#eef6f1"/>
+  <circle cx="770" cy="257" r="10" fill="#17694f"/>
+  <path d="m766 257 3 3 6-7" fill="none" stroke="#b0ffc4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="792" y="263" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="600" fill="#303832">Document your complaint</text>
+
+  <rect x="746" y="292" width="328" height="50" rx="14" fill="#eef6f1"/>
+  <circle cx="770" cy="317" r="10" fill="#17694f"/>
+  <path d="M765 312h10v10h-10Zm3 13h4" fill="none" stroke="#b0ffc4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="792" y="323" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="600" fill="#303832">Find the right next step</text>
+
+  <rect x="746" y="352" width="328" height="38" rx="12" fill="#17694f"/>
+  <text x="910" y="377" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#ffffff">Start a conversation</text>
+
+  <rect x="720" y="426" width="380" height="104" rx="20" fill="#f1f5f2"/>
+  <circle cx="758" cy="463" r="18" fill="#d8eee2"/>
+  <path d="M758 451v24m-12-12h24" stroke="#17694f" stroke-width="3" stroke-linecap="round"/>
+  <text x="790" y="458" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#303832">Friendly, clear support</text>
+  <text x="790" y="482" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#626a65">Get guidance at every step.</text>
+  <circle cx="1068" cy="478" r="6" fill="#49a878"/>
 </svg>
